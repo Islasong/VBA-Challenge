@@ -1,0 +1,155 @@
+Sub VBA_Challenge()
+
+'Loop Through All Sheets
+For Each ws In Worksheets
+
+  'Create Variables to hold LastRow, Ticker, Yearly Change, Percent Change, Total Stock Volume
+  Dim WorksheetName As String
+  Dim LastRowA As Long
+  Dim LastRowI As Long
+  Dim Ticker_symbol As String
+  Dim Yearly_Change As Double
+  Dim Percent_Change As Double
+  Dim GreatIncrease As Double
+  Dim GreatDecrease As Double
+  Dim GreatVolume As Double
+  Dim SummaryRow As Long
+  
+  'Add the word Ticker to the column Header
+  ws.Cells(1, 9).Value = "Ticker"
+  
+  'Add the word Yearly Change to the header
+  ws.Cells(1, 10).Value = "Yearly Change"
+  
+  'Add the word Percent Change to the header
+  ws.Cells(1, 11).Value = "Percent Change"
+
+  'Add the word Total Stocks Volume to the header
+  ws.Cells(1, 12).Value = "Total Stock Volume"
+  
+  'Add the word Ticker to the column Header
+  ws.Cells(1, 16).Value = "Ticker"
+  
+  'Add the word Value to the Column Header
+  ws.Cells(1, 17).Value = "Value"
+  
+  'Add the word Great % Increase, Great % Decrease and Total Volume to the cells
+  ws.Cells(2, 15).Value = "Greatest % Increase"
+  ws.Cells(3, 15).Value = "Greatest % Decrease"
+  ws.Cells(4, 15).Value = "Greatest Total Volume"
+  
+  
+  'Set Summary table first Row
+  SummaryRow = 2
+  
+  'Set start row to 2
+  x = 2
+  
+  ' Determine the last row in column A
+  LastRowA = ws.Cells(Rows.Count, 1).End(xlUp).Row
+  
+  ' Loop through all ticker symbol
+  
+  For i = 2 To LastRowA
+  
+     'Check if there are same Ticker Symbol
+     If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then
+   
+     'Write the ticker symbol in column I
+     Ticker_symbol = ws.Cells(i, 1).Value
+     ws.Cells(SummaryRow, 9).Value = Ticker_symbol
+   
+     'Calculate and write the Yearly Change in column J
+     Yearly_Change = ws.Cells(i, 6).Value - ws.Cells(x, 3).Value
+     ws.Cells(SummaryRow, 10).Value = Yearly_Change
+     
+        'Highlight the positive change in green and negative change in red
+        If Yearly_Change < 0 Then
+        ws.Cells(SummaryRow, 10).Interior.ColorIndex = 3
+        
+        Else
+        ws.Cells(SummaryRow, 10).Interior.ColorIndex = 4
+        
+        End If
+        
+      'Calaulate and Write Percent Change in column K
+      If ws.Cells(x, 3).Value <> 0 Then
+      Percent_Change = ((ws.Cells(i, 6).Value - ws.Cells(x, 3).Value) / ws.Cells(x, 3).Value)
+     
+      'Formatting Percentage
+      ws.Cells(SummaryRow, 11).Value = Format(Percent_Change, "Percent")
+     
+      Else
+      ws.Cells(SummaryRow, 11).Value = Format(0, "Percent")
+     
+      End If
+     
+     'Calculate and write total stock volume in column L
+     Total_Stock_Volume = WorksheetFunction.Sum(Range(ws.Cells(x, 7), ws.Cells(i, 7)))
+     ws.Cells(SummaryRow, 12).Value = Total_Stock_Volume
+     
+     'Add One to SummaryRow
+     SummaryRow = SummaryRow + 1
+     
+     'Add one to start row
+     x = x + 1
+     
+     End If
+     
+  Next i
+     
+  'Bonus
+  
+  GreatIncrease = ws.Cells(2, 11).Value
+  GreatDecrease = ws.Cells(2, 11).Value
+  GreatVolume = ws.Cells(2, 12).Value
+     
+  'Determine the last row in column I
+  LastRowI = ws.Cells(Rows.Count, 9).End(xlUp).Row
+  
+  
+  'Loop for Conclusion Table
+  For i = 2 To LastRowI
+  
+  'GreatIncresase-Check if next Value is bigger
+  If ws.Cells(i, 11).Value > GreatIncrease Then
+  GreatIncrease = ws.Cells(i, 11).Value
+  ws.Cells(2, 16).Value = ws.Cells(i, 9).Value
+  
+  Else
+  GreatIncrease = GreatIncrease
+  
+  End If
+  
+  'GreatDecrease-Check if next value is smaller
+  If ws.Cells(i, 11).Value < GreatDecrease Then
+  GreatDecrease = ws.Cells(i, 11).Value
+  ws.Cells(3, 16).Value = ws.Cells(i, 9).Value
+  
+  Else
+  GreatDecrease = GreatDecrease
+  
+  End If
+  
+  'Greatest Total Volume-Check if next value is bigger
+  If ws.Cells(i, 12).Value > GreatVolume Then
+  GreatVolume = ws.Cells(i, 12).Value
+  ws.Cells(4, 16).Value = ws.Cells(i, 9).Value
+  
+  Else
+  GreatVolume = GreatVolume
+  
+  End If
+  
+  'Write the result in conclusion table
+  ws.Cells(2, 17).Value = Format(GreatIncrease, "Percent")
+  ws.Cells(3, 17).Value = Format(GreatDecrease, "Percent")
+  ws.Cells(4, 17).Value = Format(GreatVolume)
+  
+  Next i
+  
+  
+
+Next ws
+
+End Sub
